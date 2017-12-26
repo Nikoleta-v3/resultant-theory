@@ -26,8 +26,8 @@ class TestSylvester(unittest.TestCase):
                                              [0, a[1], a[0]],
                                              [b[2], b[1], b[0]]]))
         self.assertEqual(matrix.det(),
-                       a[0] ** 2 * b[2] - a[0] * a[1] * b[1] + a[1] ** 2 * b[0])
-    
+                         a[0] ** 2 * b[2] - a[0] * a[1] * b[1] + a[1] ** 2 * b[0])
+
     def test_sylvester_matrix_example(self):
         """Test Sylvester's matrix for a numerical example."""
         x = sym.symbols("x")
@@ -40,4 +40,14 @@ class TestSylvester(unittest.TestCase):
                                              [0, 1, -5, 6],
                                              [1, -3, 2, 0],
                                              [0, 1, -3, 2]]))
+        self.assertEqual(matrix.det(), 0)
+
+    def test_sylvester_matrix_example_two(self):
+        """Test Sylvester's matrix for a numerical example."""
+        x = sym.symbols("x")
+
+        p = x ** 3 + 1
+        q = x + 1
+
+        matrix = sylvester_matrix(p, q, x)
         self.assertEqual(matrix.det(), 0)
