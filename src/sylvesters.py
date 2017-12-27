@@ -22,21 +22,21 @@ def sylvester_matrix(p, q, x):
     """
     p_polynomial = sym.Poly(p, x)
     q_polynomial = sym.Poly(q, x)
-    
+
     m_degree, n_degree = p_polynomial.degree(), q_polynomial.degree()
-    
+
     p_coefficients = p_polynomial.all_coeffs()
     q_coefficients = q_polynomial.all_coeffs()
-    
+
     matrix_size = m_degree + n_degree
-    
+
     matrix = []
     for row in [p_coefficients, q_coefficients]:
         matrix.append(row)
         while len(row) < matrix_size:
             row = [0] + row
             matrix.append(row)
-    
+
     for row in matrix:
         while len(row) < matrix_size:
             row.append(0)
