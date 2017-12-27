@@ -1,0 +1,172 @@
+\documentclass{article}
+
+\usepackage[margin=1.5cm, includefoot, footskip=30pt]{geometry}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+\renewcommand{\baselinestretch}{1}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+
+\usepackage{minted}
+\usemintedstyle{tango}
+
+\title{Resultant theory. A brief overview.}
+
+\begin{document}
+\maketitle
+
+Recently while I working on my research a came across a problem.
+I was faced with a number of multivariate systems and there are two things I need
+to know for these systems,
+
+\begin{itemize}
+    \item do the polynomials of each system have common roots?
+    \item and if yes could we identify them;
+\end{itemize}
+
+In order to address these questions and move on with my research it was decided
+that I was going down the line of the resultant theory! The resultant initially help
+us identify whether the system has a common root and furthermore we could use
+resultant theory to find those roots as well. Here I will only talk about the
+first usefulness of the resultants.
+
+If \(p\) and \(q\) are two polynomials the can be factored into linear factors,
+
+\begin{eqnarray*}
+    p(x) = & a_{0}(x-r_{1})(x-r_{2})\cdots(x-r_{m}) \\
+    q(x)= & b_{0}(x-s_{1})(x-s_{2})\cdots(x-s_{n})
+\end{eqnarray*}
+
+then the \textbf{resultant} \(R\) of \(p\) and \(q\) is defined as,
+
+\begin{equation*}
+    R =a_{0}^{n}b_{0}^{m}\prod_{{i=1}}^{m}\prod_{{j=1}}^{n}(r_{i}-s_{j})
+\end{equation*}
+
+From the definition, it is clear that the resultant will equal zero if and only
+if \(p\) and \(q\) have at least one common root. Thus if we want to know
+if common roots exist we only have to calculate the resultant and test whether
+it is equal to zero.
+
+Calculating the resultant in this way can be expensive. An explicit formula for
+the resultant as a determinant was given by Sylvesterin 1840
+\url{http://www.tandfonline.com/doi/abs/10.1080/14786444008649995}.
+
+Let us consider that \(p\) and \(q\) are,
+
+\begin{eqnarray*}
+    p(x) = & \displaystyle\sum_{i=0}^{m} a_i x^i \\
+    q(x) = & \displaystyle\sum_{i=0}^{n} b_i x^i
+\end{eqnarray*}
+
+where  \(deg(p) = m\)and \(deg(q) = n\). The Sylvester matrix of \(p\) and \(q\)
+is the \((m+n) \times (m+n)\) matrix,
+
+\[
+    \left|\begin{matrix}
+        a_{0} & a_{1}& a_{2} & \ldots &a_{m}     & 0     & \ldots & 0 \cr
+        0     & a_{0}& a_{1} & \ldots &a_{{m-1}} & a_{m} & \ldots & 0 \cr
+              &      & \ddots&.&.&.&.&.\cr
+        0&0&.&.&.&.&.&a_{m}\cr 
+        b_{0}&b_{1}&b_{2}&\ldots&b_{n}&0&\ldots&0 \cr
+        0&b_{0}&b_{1}&\ldots&b_{{n-1}}&b_{n}&\ldots&0 \cr 
+        &&\ddots&.&.&.&.&.\cr
+        0&0&.&.&.&.&.&b_{n}\cr
+    \end{matrix}\right|
+\]
+
+in which there are \(n\) rows of \(p\) coefficients, \(m\) rows of \(q\) coefficients,
+and all elements not shown are zero. The resultant is the determinant
+of the Sylvester matrix.
+
+The Sylvester's resultant is implemented in the python library
+Sympy. Thus here I will give you a numerical example. Note that I have also
+implemented the Sylvester's resultant and my code can be found here:
+but for the example I will be using the implemented version of Sympy.
+
+\begin{minted}
+    [
+    autogobble=true,
+    framesep=2mm,
+    fontsize=\normalsize,
+    ]
+    {python}
+>>> import sympy as sym
+>>> from sympy.polys import subresultants_qq_zz
+
+>>> x = sym.symbols('x')
+
+>>> f = x ** 2 - 5 * x + 6
+>>> g = x ** 2 - 3 * x + 2
+
+>>> matrix = subresultants_qq_zz.sylvester(f, g, x)
+>>> matrix
+Matrix([
+[1, -5,  6, 0],
+[0,  1, -5, 6],
+[1, -3,  2, 0],
+[0,  1, -3, 2]])
+>>> matrix.det()
+0
+\end{minted}
+
+Note that the Sylvester's resultant is very useful but can only handle up to 
+2 variables. An alternative matrix formulation was given by Bezout during the
+eighteenth century. The Bezout formulation was then reformulated by Caley in 1865
+and this is the second formulation we will discuss here. I will calling it
+the Bezout Caley formulation.
+
+Let us consider again the univariate polynomials \(p\) and \(q\). Let the 
+\(d_{\text{max}} = max(degree(p, x), degree(q, x))\). Consider the polynomial,
+
+\begin{equation*}
+\Delta(x, a) = \left|\begin{matrix}
+        p(x) & q(x)\cr
+        p(a)& q(a)
+        \end{matrix}%
+        \right|
+\end{equation*}
+
+where \(\alpha\) is a new variable and \(p(a)\) stands for uniformly replacing
+\(x\) by \(\alpha\) in \(p\). Making \(x = \alpha\) would make \(\Delta = O\)
+which means that \(x – \alpha\) divides \(\Delta\). Thus the Bezout Cayley 
+polynomial of degree \(d_{\text{max}} - 1\)is defined as,
+
+\[\delta(x, a) = \frac{\Delta(x,a)}{x-a}\]
+
+The polynomial is symmetric in \(x\) and \(\alpha\). Every common zero of \(p(x)\)
+and \(q(x)\) is a zero of \(\delta(x, \alpha\) no matter what value \(\alpha\) has;
+thus at a common zero of \(p\) and \(q\), the coefficient of every power product
+of \(\alpha\) in \(\delta(x, \alpha\) must be O.
+
+Thus we have  a \(d_{max} - 1\) equations by equating the coefficients of 
+the power products of \(\alpha\) to zero. Treating \(x ^0, x^1, \dots, x^{d_{max} -1}
+\) as unknowns we retrieve \(d_{max} - 1\) equations in \(d_{max} - 1\) unknowns.
+They will have a common root if and only if the the determinant of the
+coefficient matrix is equal to 0, this \(d_{max} \times d_{max}\) matrix is
+the Bezout Cayley matrix.
+
+A numerical example:
+
+\begin{minted}
+    [
+    autogobble=true,
+    framesep=2mm,
+    fontsize=\normalsize,
+    ]
+    {python}
+>>> f = sym.lambdify(x, x ** 2 - 5 * x + 6)
+>>> g = sym.lambdify(x, x ** 2 - 3 * x + 2)
+
+>>> matrix = subresultants_qq_zz.bezout(f(x), g(x), x)
+>>> matrix
+Matrix([
+[ 8, -4],
+[-4,  2]])
+>>> matrix.det()
+0
+\end{minted}
+
+\end{document}
