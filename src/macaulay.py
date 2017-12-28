@@ -8,7 +8,7 @@ import sympy as sym
 from sympy.polys.monomials import itermonomials
 from sympy.functions.combinatorial.factorials import binomial
 
-class Macaulay():
+class MacaulayResultant():
     """
     A class for calculating the Macaulay resultant.
     """
@@ -16,76 +16,136 @@ class Macaulay():
         """
         Parameters
         ----------          
-        n: integer
-            Number of variables and polynomials.
+        A class that takes two lists, a list of n polynomials and list of n
+        variables. Returns the Maucalay's matrices of the multivariate system.
+
+        Parameters
+        ----------
         variables: list
             A list of all n variables
         polynomials : list of sympy polynomials
-            A list of n ndegree popynomials
-        degrees: list
-            A list of max degree of each polynomial
-        degree_m: integer
-            The degree_m (as referenced in literature)
-        mononomials_size: integer
-            The size of the set containg all the possible monomials of our variables of degree d_m
+            A  list of m n-degree polynomials
         """
         self.polynomials = polynomials
         self.variables = variables
         self.n = len(variables)
-        self.degrees = [self.get_polynomial_degree(poly) for poly in self.polynomials]
-        self.degree_m = self.get_degree_m()
-        self.mononomials_size = self.get_size()
 
+        self.degrees = self.get_max_degrees()
+        self.degree_m = self.get_degree_m()
+        self.monomials_size = self.get_size()
+
+    def get_max_degrees(self):
+        """
+        Returns
+        -------
+        degrees: list
+            A list of the d_max of each polynomial
+        """
+        degrees = [self.get_polynomial_degree(poly) for poly in self.polynomials]
+        return degrees
 
     def get_polynomial_degree(self, poly):
+        """
+        Returns
+        -------
+        degree: int
+            The degree of a polynomial
+        """
         return sym.Poly(poly(*self.variables)).degree()
 
     def get_degree_m(self):
+        """
+        Returns
+        -------
+        degree_m: int
+            The degree_m is calculated as  1 + \sum_1 ^ n (d_i - 1), where
+            d_i is the degree of the i polynomial
+        """
         return 1 + sum([d - 1 for d in self.degrees])
 
     def get_size(self):
+        """
+        Returns
+        -------
+        size: int
+            The size of set T. Set T is the set of all possible monomials of
+            the n variables for degree equal to the degree_m 
+        """
         return binomial(self.degree_m + self.n - 1, self.n - 1)
 
     def get_monomials_of_certain_degree(self, degree):
+        """
+        Returns
+        -------
+        monomials: list
+            A list of monomials of a certain degree. Sympy returns up to a degree
+        """
         return list(itermonomials(self.variables, degree) -
                     itermonomials(self.variables, degree - 1))
 
     def get_monomials_set(self):
-        monomials = self.get_monomials_of_certain_degree(self.degree_m)
-        self.monomials = monomials
+        """
+        Returns
+        -------
+        self.monomial_set: set
+            The set T. Set of all possible monomials of degree degree_m
+        """
+        monomial_set = self.get_monomials_of_certain_degree(self.degree_m)
+        self.monomial_set = monomial_set
 
     def get_row_coefficients(self):
-        row_coeff = []
-        divisable = []
+        """
+        Returns
+        -------
+        row_coefficients: list
+            The row coefficients of Macaulay's matrix
+        """
+        row_coefficients = []
+        divisible = []
         for i in range(self.n):
             if i == 0:
-                row_coeff.append(self.get_monomials_of_certain_degree(self.degree_m - self.degrees[i]))
+                row_coefficients.append(self.get_monomials_of_certain_degree(self.degree_m - self.degrees[i]))
 
             else:
-                divisable.append(self.variables[i - 1] ** self.degrees[i - 1])
+                divisible.append(self.variables[i - 1] ** self.degrees[i - 1])
                 poss_rows = self.get_monomials_of_certain_degree(self.degree_m - self.degrees[i])
-                for div in divisable:
+                for div in divisible:
                     for p in poss_rows:
                         if p % div == 0:
                             poss_rows.remove(p)
-                row_coeff.append(poss_rows)   
-        return row_coeff
+                row_coefficients.append(poss_rows)
+        return row_coefficients
 
     def get_matrix(self):
+        """
+        Returns
+        -------
+        macaulay_matrix: sym Matrix
+            The Macaulay's matrix
+        """
         rows = []
-        row_coeff = self.get_row_coefficients()
+        row_coefficients = self.get_row_coefficients()
         for i in range(self.n):
-            for multiplier in row_coeff[i]:
-                coeffs = []
+            for multiplier in row_coefficients[i]:
+                coefficients = []
                 poly = sym.Poly(self.polynomials[i](*self.variables) * multiplier, *self.variables)
 
                 for mono in self.monomial_set:
-                    coeffs.append(poly.coeff_monomial(mono))
-                rows.append(coeffs)
-        return sym.Matrix(rows)
+                    coefficients.append(poly.coeff_monomial(mono))
+                rows.append(coefficients)
+
+        macaulay_matrix = sym.Matrix(rows)
+        return macaulay_matrix
 
     def get_reduced_nonreduced(self):
-
+        """
+        Returns
+        -------
+        reduced: list
+            A list of the reduced monomials
+        non_reduced: list
+            A list of the monomials that are not reduced
+        """
         divisible = []
         for m in self.monomial_set:
             temp = []
@@ -99,8 +159,14 @@ class Macaulay():
         return reduced, non_reduced
 
     def get_submatrix(self, matrix):
+        """
+        Returns
+        -------
+        macaulay_submatrix: sym Matrix
+            The Macaulay's matrix
+        """
         reduced, non_reduced = self.get_reduced_nonreduced()
-        
+
         ais = list([self.polynomials[i](*self.variables).coeff(self.variables[i] ** self.degrees[i]) 
                     for i in range(self.n)])
 

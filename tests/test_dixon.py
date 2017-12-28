@@ -1,5 +1,5 @@
 """
-A file to test Dixon's matrix.
+A file to test Dixon's formulation.
 """
 import sys
 sys.path.insert(0, '../src/')
