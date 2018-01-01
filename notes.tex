@@ -17,26 +17,31 @@
 \begin{document}
 \maketitle
 
-Recently while I working on my research a came across a problem.
-I was faced with a number of multivariate systems and there are two things I need
-to know for these systems,
+Recently I am working on a project to explore the memory size effect of players
+in the iterated prisoner's dilemma. While working on my project, I have came
+across a number of multivariate systems. There are two things I need to know
+about the systems:
 
 \begin{itemize}
     \item do the polynomials of each system have common roots?
-    \item and if yes could we identify them;
+    \item and if they do, could we identify those roots.
 \end{itemize}
 
-In order to address these questions and move on with my research it was decided
-that I was going down the line of the resultant theory! The resultant initially help
-us identify whether the system has a common root and furthermore we could use
-resultant theory to find those roots as well. Here I will only talk about the
-first usefulness of the resultants.
+To answer these two questions it was decided that I was going down the line of
+the \textbf{resultant theory.} The resultant is a function that can help us 
+to:
 
-If \(p\) and \(q\) are two polynomials the can be factored into linear factors,
+\begin{itemize}
+    \item identify whether the system has a common root
+    \item and can also help us to find those roots.
+\end{itemize}
+
+Firstly let explain in detail what the resultant is. Assume that \(p\) and \(q\)
+are two polynomials the can be factored into linear factors,
 
 \begin{eqnarray*}
-    p(x) = & a_{0}(x-r_{1})(x-r_{2})\cdots(x-r_{m}) \\
-    q(x)= & b_{0}(x-s_{1})(x-s_{2})\cdots(x-s_{n})
+    p(x) = & a_{0} (x - r_{1}) (x - r_{2}) \cdots (x - r_{m}) \\
+    q(x) = & b_{0} (x - s_{1}) (x - s_{2}) \cdots (x - s_{n})
 \end{eqnarray*}
 
 then the \textbf{resultant} \(R\) of \(p\) and \(q\) is defined as,
@@ -46,23 +51,21 @@ then the \textbf{resultant} \(R\) of \(p\) and \(q\) is defined as,
 \end{equation*}
 
 From the definition, it is clear that the resultant will equal zero if and only
-if \(p\) and \(q\) have at least one common root. Thus if we want to know
-if common roots exist we only have to calculate the resultant and test whether
-it is equal to zero.
+if \(p\) and \(q\) have at least one common root. Thus, identifying whether
+common roots exist for a system becomes trivial. Though calculating the resultant
+as the products of the roots of each polynomial can be computational expensive.
 
-Calculating the resultant in this way can be expensive. An explicit formula for
-the resultant as a determinant was given by Sylvesterin 1840
-\url{http://www.tandfonline.com/doi/abs/10.1080/14786444008649995}.
-
-Let us consider that \(p\) and \(q\) are,
+An explicit formula for the resultant as a determinant was given by \textbf{Sylvester} in 1840
+\url{http://www.tandfonline.com/doi/abs/10.1080/14786444008649995}. Assume that
+\(p\) and \(q\) are given by,
 
 \begin{eqnarray*}
     p(x) = & \displaystyle\sum_{i=0}^{m} a_i x^i \\
     q(x) = & \displaystyle\sum_{i=0}^{n} b_i x^i
 \end{eqnarray*}
 
-where  \(deg(p) = m\)and \(deg(q) = n\). The Sylvester matrix of \(p\) and \(q\)
-is the \((m+n) \times (m+n)\) matrix,
+where \(deg(p) = m\) and \(deg(q) = n\). The Sylvester matrix is defined as
+the \((m+n) \times (m+n)\) matrix,
 
 \[
     \left|\begin{matrix}
@@ -78,13 +81,10 @@ is the \((m+n) \times (m+n)\) matrix,
 \]
 
 in which there are \(n\) rows of \(p\) coefficients, \(m\) rows of \(q\) coefficients,
-and all elements not shown are zero. The resultant is the determinant
-of the Sylvester matrix.
-
-The Sylvester's resultant is implemented in the python library
-Sympy. Thus here I will give you a numerical example. Note that I have also
-implemented the Sylvester's resultant and my code can be found here:
-but for the example I will be using the implemented version of Sympy.
+and all elements not shown are zero. It was proven that the determinant of the
+Sylvester's matrix is equal to the determinant. The Sylvester's matrix is
+implemented in the python library Sympy. Thus a numerical example is considered
+using the Sympy library,
 
 \begin{minted}
     [
@@ -98,10 +98,10 @@ but for the example I will be using the implemented version of Sympy.
 
 >>> x = sym.symbols('x')
 
->>> f = x ** 2 - 5 * x + 6
->>> g = x ** 2 - 3 * x + 2
+>>> p = x ** 2 - 5 * x + 6
+>>> q = x ** 2 - 3 * x + 2
 
->>> matrix = subresultants_qq_zz.sylvester(f, g, x)
+>>> matrix = subresultants_qq_zz.sylvester(p, q, x)
 >>> matrix
 Matrix([
 [1, -5,  6, 0],
@@ -112,14 +112,14 @@ Matrix([
 0
 \end{minted}
 
-Note that the Sylvester's resultant is very useful but can only handle up to 
-2 variables. An alternative matrix formulation was given by Bezout during the
-eighteenth century. The Bezout formulation was then reformulated by Caley in 1865
-and this is the second formulation we will discuss here. I will calling it
-the Bezout Caley formulation.
+An alternative matrix formulation of the resultant was given by Bezout during the
+eighteenth century. The Bezout formulation was then reformulated by Cayley in 1865
+and this is the second formulation discussed here, we will refer to it as the 
+\textbf{Bezout Caley} formulation.
 
-Let us consider again the univariate polynomials \(p\) and \(q\). Let the 
-\(d_{\text{max}} = max(degree(p, x), degree(q, x))\). Consider the polynomial,
+Consider again the polynomials \(p\) and \(q\) and let
+\(d_{\text{max}} = max(degree(p, x), degree(q, x))\). The construct the following
+polynomial,
 
 \begin{equation*}
 \Delta(x, a) = \left|\begin{matrix}
@@ -131,24 +131,17 @@ Let us consider again the univariate polynomials \(p\) and \(q\). Let the
 
 where \(\alpha\) is a new variable and \(p(a)\) stands for uniformly replacing
 \(x\) by \(\alpha\) in \(p\). Making \(x = \alpha\) would make \(\Delta = O\)
-which means that \(x – \alpha\) divides \(\Delta\). Thus the Bezout Cayley 
-polynomial of degree \(d_{\text{max}} - 1\)is defined as,
+which means that \(x – \alpha\) divides \(\Delta\). The polynomial is called the
+Bezout Cayley polynomial, is of degree \(d_{\text{max}} - 1\) and is defined as,
 
 \[\delta(x, a) = \frac{\Delta(x,a)}{x-a}\]
 
 The polynomial is symmetric in \(x\) and \(\alpha\). Every common zero of \(p(x)\)
-and \(q(x)\) is a zero of \(\delta(x, \alpha\) no matter what value \(\alpha\) has;
+and \(q(x)\) is a zero of \(\delta(x, \alpha)\) no matter what value \(\alpha\) has;
 thus at a common zero of \(p\) and \(q\), the coefficient of every power product
-of \(\alpha\) in \(\delta(x, \alpha\) must be O.
+of \(\alpha\) in \(\delta(x, \alpha)\) must be 0.
 
-Thus we have  a \(d_{max} - 1\) equations by equating the coefficients of 
-the power products of \(\alpha\) to zero. Treating \(x ^0, x^1, \dots, x^{d_{max} -1}
-\) as unknowns we retrieve \(d_{max} - 1\) equations in \(d_{max} - 1\) unknowns.
-They will have a common root if and only if the the determinant of the
-coefficient matrix is equal to 0, this \(d_{max} \times d_{max}\) matrix is
-the Bezout Cayley matrix.
-
-A numerical example:
+Before moving forward let us consider a numerical example.
 
 \begin{minted}
     [
@@ -157,16 +150,97 @@ A numerical example:
     fontsize=\normalsize,
     ]
     {python}
->>> f = sym.lambdify(x, x ** 2 - 5 * x + 6)
->>> g = sym.lambdify(x, x ** 2 - 3 * x + 2)
+>>> import imp
+>>> bezout = imp.load_source('bezout', '../src/cayley_bezout.py')
+>>> p(x)
+x**2 - 5*x + 6
+>>> q(x)
+x**2 - 3*x + 2
 
->>> matrix = subresultants_qq_zz.bezout(f(x), g(x), x)
+>>> a = sym.symbols('alpha')
+>>> matrix = sym.Matrix([[p(x), q(x)], [p(a), q(a)]])
 >>> matrix
 Matrix([
-[ 8, -4],
-[-4,  2]])
+[        x**2 - 5*x + 6,         x**2 - 3*x + 2],
+[alpha**2 - 5*alpha + 6, alpha**2 - 3*alpha + 2]])
+>>> bezout_polynomial = (matrix.det() / (x - a)).factor().collect(a)
+>>> bezout_polynomial.expand()
+2*alpha*x - 4*alpha - 4*x + 8
+\end{minted}
+
+Thus we have  a \(d_{max} - 1\) equations by equating the coefficients of 
+the power products of \(\alpha\) to zero. Treating \(x ^0, x^1, \dots, x^{d_{max} -1}
+\) as unknowns we retrieve \(d_{max} - 1\) equations in \(d_{max} - 1\) unknowns.
+
+Theses will have a common root if and only if the the determinant of the
+coefficient matrix is equal to 0, this \(d_{max} \times d_{max}\) matrix is
+the Bezout Cayley matrix.
+
+\begin{minted}
+    [
+    autogobble=true,
+    framesep=2mm,
+    fontsize=\normalsize,
+    ]
+    {python}
+>>> bezout.cayley_bezout_matrix(p, q, x)
+Matrix([
+[-4,  2],
+[ 8, -4]])
+>>> bezout.cayley_bezout_matrix(p, q, x).det()
+0
+\end{minted}
+
+Note that Bezout Cayley matrix for most cases, as shown in our example, is smaller
+than the Sylverster's. So computational the Bezout Cayley can be favoured over
+Sylverster's. Both formulation though can handle only up to a 2 variables system.
+
+\textbf{Dixon} in 1908 showed how the Bezout Cayley ca be extended to $n + 1$ polynomials
+in $n$ variables. Thus following a similar manner to that of Bezout Cayley,
+
+\[
+    \Delta(x_1,\dots, x_n, \alpha_1, \dots, \alpha_n) = \left|\begin{matrix}
+        p_1(x_1,\dots, x_n) & \dots &p_n(x_1,\dots, x_n) \cr
+        p_1(\alpha_1,\dots, x_n) & \dots &p_n(\alpha_1,\dots, x_n) \cr
+        p_1(\alpha_1,\dots, \alpha_n) & \dots &p_n(\alpha_1,\dots, \alpha_n) 
+        \end{matrix}\right|
+\]
+
+\[\delta = \frac{\Delta(x_1,\dots, x_n, \alpha_1, \dots, \alpha_n)}{((x_1 - \alpha_1) \dots (x_n - \alpha_n))}\]
+
+The polynomials \(\delta\) is called the Dixon's polynomial and the Dixon's
+matrix is constructed as,
+
+A numerical example for Dixon:
+
+\begin{minted}
+    [
+    autogobble=true,
+    framesep=2mm,
+    fontsize=\normalsize,
+    ]
+    {python}
+>>> dixon = imp.load_source('dixon', '../src/dixon.py')
+>>> y = sym.symblos('y')
+>>> p = sym.lambdify((x, y), x + y)
+>>> q = sym.lambdify((x, y), x ** 2 + y **3)
+>>> h = sym.lambdify((x, y), x ** 2 + y)
+
+>>> dixon = dixon.DixonResultant([p, q, h], (x, y))
+>>> poly = dixon.get_dixon_polynomial()
+>>> matrix = dixon.get_dixon_matrix(polynomial=poly)
 >>> matrix.det()
 0
 \end{minted}
+
+Now that I 
+This work in more details developed in the following piece of work which is
+no a pre print paper and under reviewing process. The pre print can be found
+on arXiv:[https://arxiv.org/abs/1712.07640](https://arxiv.org/abs/1712.07640).
+Furthermore, the code for all the numerical experiments held are
+only and on github:
+[https://github.com/drvinceknight/Evolutionary-game-theoretic-Model-of-Rhino-poaching](https://github.com/drvinceknight/Evolutionary-game-theoretic-Model-of-Rhino-poaching).
+Note that all source code has been documented and tested
+properly.
 
 \end{document}
