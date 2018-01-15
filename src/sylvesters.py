@@ -1,22 +1,20 @@
 """
-A function for creating the Sylvester's matrix and calculating the Sylvester's
-resultant. Literature: http://comet.lehman.cuny.edu/vpan/pdf/DEKPalg.pdf
+Function for constructing the Sylvester's matrix.
+Literature: http://comet.lehman.cuny.edu/vpan/pdf/DEKPalg.pdf
 """
-
 import sympy as sym
-
 
 def sylvester_matrix(p, q, x):
     """
     A function that takes two non zero polynomials, of degree m and n respectively
-    and returns the Sylvester's matrix $(m+n)\times(m+n)$.
+    and returns the Sylvester's matrix (m + n) x (m + n).
 
     Parameters
     ----------
     p: sympy expression
-        A non zero polynomial of degree $m$.
+        A non zero polynomial of degree m.
     q: sympy expression
-        A non zero polynomial of degree $n$.
+        A non zero polynomial of degree n.
     x: sympy symbol
         Variable for which we are solving.
     """
