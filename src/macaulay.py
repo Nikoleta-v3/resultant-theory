@@ -6,6 +6,7 @@ resultant. Literature:
 import sympy as sym
 
 from sympy.polys.monomials import itermonomials
+from sympy.polys.orderings import monomial_key
 from sympy.functions.combinatorial.factorials import binomial
 
 class MacaulayResultant():
@@ -80,8 +81,10 @@ class MacaulayResultant():
         monomials: list
             A list of monomials of a certain degree. Sympy returns up to a degree
         """
-        return list(itermonomials(self.variables, degree) -
-                    itermonomials(self.variables, degree - 1))
+        monomials = list(itermonomials(self.variables, degree) -
+                         itermonomials(self.variables, degree - 1))
+
+        return sorted(monomials, key=monomial_key('lex', self.variables))[::-1]
 
     def get_monomials_set(self):
         """
@@ -105,14 +108,13 @@ class MacaulayResultant():
         for i in range(self.n):
             if i == 0:
                 row_coefficients.append(self.get_monomials_of_certain_degree(self.degree_m - self.degrees[i]))
-
             else:
                 divisible.append(self.variables[i - 1] ** self.degrees[i - 1])
                 poss_rows = self.get_monomials_of_certain_degree(self.degree_m - self.degrees[i])
                 for div in divisible:
                     for p in poss_rows:
-                        if p % div == 0:
-                            poss_rows.remove(p)
+                        if sym.fraction((p / div).expand())[1] == 1 :
+                            poss_rows = [item for item in poss_rows if item != p]
                 row_coefficients.append(poss_rows)
         return row_coefficients
 
@@ -153,10 +155,10 @@ class MacaulayResultant():
                 temp.append(sym.Poly(m, v).degree() >= self.degrees[i])
             divisible.append(temp)
 
-        reduced = [i for i, r in enumerate(divisible) if sum(r) < 2]
-        non_reduced = [i for i, r in enumerate(divisible) if sum(r) >= 2]
+        reduced = [i for i, r in enumerate(divisible) if sum(r) < self.n - 1]
+        non_reduced = [i for i, r in enumerate(divisible) if sum(r) >= self.n -1]
 
-        return reduced, non_reduced
+        return reduced, non_reduced 
 
     def get_submatrix(self, matrix):
         """
@@ -167,7 +169,9 @@ class MacaulayResultant():
         """
         reduced, non_reduced = self.get_reduced_nonreduced()
 
-        ais = list([self.polynomials[i](*self.variables).coeff(self.variables[i] ** self.degrees[i]) 
+        reduction_set = [v ** self.degrees[i] for i, v in enumerate(self.variables)]
+
+        ais = list([self.polynomials[i](*self.variables).coeff(reduction_set[i])
                     for i in range(self.n)])
 
         reduced_matrix = matrix[:, reduced]

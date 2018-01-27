@@ -80,8 +80,32 @@ class TestDixonResultant(unittest.TestCase):
 
         self.assertEqual(dixon.get_coefficients_of_alpha(polynomial), coefficients)
 
+    def test_get_upper_degree(self):
+        """Tests upper degree function."""
+        h = sym.lambdify((x, y), c * x ** 2 + y)
+        dixon = DixonResultant(polynomials=[h, q], variables=variables)
+
+        self.assertEqual(dixon.get_upper_degree(), 2)
+
+    def test_get_dixon_matrix_example_two(self):
+        """Test Dixon's matrix for example from:
+        https://rd.springer.com/content/pdf/10.1007%2Fs00190-007-0199-0.pdf
+        """
+        z = sym.symbols('z')
+
+        f = sym.lambdify((y, z), x ** 2 + y ** 2 - 1 + z * 0)
+        g = sym.lambdify((y, z), x ** 2 + z ** 2 - 1 + y * 0)
+        h = sym.lambdify((y, z), y ** 2 + z ** 2 - 1)
+
+        example_two = DixonResultant([f, g, h], [y, z])
+        poly = example_two.get_dixon_polynomial()
+        matrix = example_two.get_dixon_matrix(poly)
+
+        expr = 1 - 8 * x ** 2 + 24 * x ** 4 - 32 * x ** 6 + 16 * x ** 8
+        self.assertEqual(matrix.det(), expr)
+
     def test_get_dixon_matrix(self):
-        """Test Dixon's coefficients of a_1,...,a_n products for a numerical example."""
+        """Test Dixon's resultant for a numerical example."""
 
         x, y = sym.symbols('x, y')
         a = sym.IndexedBase("alpha")

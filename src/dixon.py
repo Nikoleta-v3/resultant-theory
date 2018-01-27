@@ -59,10 +59,7 @@ class DixonResultant():
             A list of the d_max of each variable. The max degree is the
             max(degree(p_1, x_i), ..., degree(p_m, x_i))
         """
-        max_degrees = []
-        for v in self.variables:
-            max_degrees.append(max([sym.Poly(f(*self.variables)).degree(v) for f in self.polynomials]))
-        return max_degrees
+        return [sym.degree(f(*self.variables)) for f in self.polynomials]
 
     def get_dixon_polynomial(self):
         """
@@ -114,7 +111,15 @@ class DixonResultant():
             coefficients.append(polynomial.coeff_monomial(monomial))
 
         return coefficients
-    
+
+    def get_upper_degree(self):
+        list_of_products = [self.variables[i] ** ((i + 1) * self.max_degrees[i] -1)
+                                                        for i in range(self.n)]
+        product =  np.prod(list_of_products)
+        product = sym.Poly(product).monoms()
+
+        return sym.polys.monomials.monomial_deg(*product)
+
     def get_dixon_matrix(self, polynomial):
         """
         Construct the Dixon matrix from the coefficients of polynomial \alpha. Each coefficient is
@@ -122,7 +127,7 @@ class DixonResultant():
         """
         coefficients = self.get_coefficients_of_alpha(polynomial)
         size = len(polynomial.monoms())
-        monomials = list(itermonomials(self.variables, sum(self.max_degrees)))
+        monomials = list(itermonomials(self.variables, self.get_upper_degree()))
 
         array = np.array([[sym.Poly(c, *self.variables).coeff_monomial(m) for m in monomials]
                                                          for c in coefficients])

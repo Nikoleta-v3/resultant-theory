@@ -4,3 +4,9 @@
 
 */__pycache__/*
 
+# blog files
+_minted-notes/*
+*.aux
+*.log
+*.out
+*.tex
