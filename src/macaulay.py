@@ -52,7 +52,7 @@ class MacaulayResultant():
         degree: int
             The degree of a polynomial
         """
-        return sym.Poly(poly(*self.variables)).degree()
+        return max(sym.Poly(poly(*self.variables)).degree_list())
 
     def get_degree_m(self):
         """
@@ -110,7 +110,11 @@ class MacaulayResultant():
                 row_coefficients.append(self.get_monomials_of_certain_degree(self.degree_m - self.degrees[i]))
             else:
                 divisible.append(self.variables[i - 1] ** self.degrees[i - 1])
-                poss_rows = self.get_monomials_of_certain_degree(self.degree_m - self.degrees[i])
+                degree = self.degree_m - self.degrees[i]
+                if degree == 0:
+                    poss_rows = [1]
+                else:
+                    poss_rows = self.get_monomials_of_certain_degree(self.degree_m - self.degrees[i])
                 for div in divisible:
                     for p in poss_rows:
                         if sym.fraction((p / div).expand())[1] == 1 :
@@ -155,8 +159,17 @@ class MacaulayResultant():
                 temp.append(sym.Poly(m, v).degree() >= self.degrees[i])
             divisible.append(temp)
 
+<<<<<<< HEAD
         reduced = [i for i, r in enumerate(divisible) if sum(r) < self.n - 1]
         non_reduced = [i for i, r in enumerate(divisible) if sum(r) >= self.n -1]
+=======
+        non_reduced = []
+        minus = 1
+        while not non_reduced:
+            reduced = [i for i, r in enumerate(divisible) if sum(r) < self.n - minus]
+            non_reduced = [i for i, r in enumerate(divisible) if sum(r) >= self.n - minus]
+            minus += 1
+>>>>>>> corrections
 
         return reduced, non_reduced 
 
