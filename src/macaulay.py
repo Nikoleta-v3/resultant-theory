@@ -159,17 +159,12 @@ class MacaulayResultant():
                 temp.append(sym.Poly(m, v).degree() >= self.degrees[i])
             divisible.append(temp)
 
-<<<<<<< HEAD
-        reduced = [i for i, r in enumerate(divisible) if sum(r) < self.n - 1]
-        non_reduced = [i for i, r in enumerate(divisible) if sum(r) >= self.n -1]
-=======
         non_reduced = []
         minus = 1
         while not non_reduced:
             reduced = [i for i, r in enumerate(divisible) if sum(r) < self.n - minus]
             non_reduced = [i for i, r in enumerate(divisible) if sum(r) >= self.n - minus]
             minus += 1
->>>>>>> corrections
 
         return reduced, non_reduced 
 
